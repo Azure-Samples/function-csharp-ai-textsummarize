@@ -37,7 +37,7 @@ Search for Environment Variables in Settings, create new System Variables simila
 | AI_URL | *Paste from step 4* |
 | AI_SECRET | *Paste from step 4* |
 6) [Azure Storage Explorer](https://azure.microsoft.com/en-us/products/storage/storage-explorer/) or storage explorer features of [Azure Portal](https://portal.azure.com)
-7) Add this local.settings.json file to the text_summarize folder to simplify local development.  Optionally fill in the AI_URL and AI_SECRET values per step 4.  This file will be gitignored to protect secrets from committing to your repo.  
+7) Add this `local.settings.json` file to the `./text_summarization` folder to simplify local development.  Optionally fill in the AI_URL and AI_SECRET values per step 4.  This file will be gitignored to protect secrets from committing to your repo.  
 ```json
 {
     "IsEncrypted": false,
@@ -52,9 +52,21 @@ Search for Environment Variables in Settings, create new System Variables simila
 
 ### Using Visual Studio
 1) Open `text_summarization.sln` using Visual Studio 2022 or later.
-2) Press Run (`F5`) to run in the debugger
-3) Open Storage Explorer, Storage Accounts -> Emulator -> Blob Containers -> and create a container `test-samples-trigger` if it does not already exists
-4) Copy any .txt document file with text into the `test-samples-trigger` container
+2) Add this `local.settings.json` file to the `./text_summarization` folder to simplify local development.  Optionally fill in the AI_URL and AI_SECRET values per step 4 above.  This file will be gitignored to protect secrets from committing to your repo.  
+```json
+{
+    "IsEncrypted": false,
+    "Values": {
+        "AzureWebJobsStorage": "UseDevelopmentStorage=true",
+        "FUNCTIONS_WORKER_RUNTIME": "dotnet-isolated",
+        "AI_URL": "",
+        "AI_SECRET": ""
+    }
+}
+```
+3) Press Run (`F5`) to run in the debugger
+4) Open Storage Explorer, Storage Accounts -> Emulator -> Blob Containers -> and create a container `test-samples-trigger` if it does not already exists
+5) Copy any .txt document file with text into the `test-samples-trigger` container
 
 You will see AI analysis happen in the Terminal standard out.  The analysis will be saved in a .txt file in the `` blob container.
 
@@ -64,9 +76,21 @@ You will see AI analysis happen in the Terminal standard out.  The analysis will
 ```bash
 code .
 ```
-2) Run and Debug by pressing `F5`
-2) Open Storage Explorer, Storage Accounts -> Emulator -> Blob Containers -> and create a container `test-samples-trigger` if it does not already exists
-3) Copy any .txt document file with text into the `test-samples-trigger` container
+2) Add this `local.settings.json` file to the `./text_summarization` folder to simplify local development.  Optionally fill in the AI_URL and AI_SECRET values per step 4 above.  This file will be gitignored to protect secrets from committing to your repo.  
+```json
+{
+    "IsEncrypted": false,
+    "Values": {
+        "AzureWebJobsStorage": "UseDevelopmentStorage=true",
+        "FUNCTIONS_WORKER_RUNTIME": "dotnet-isolated",
+        "AI_URL": "",
+        "AI_SECRET": ""
+    }
+}
+```
+3) Run and Debug by pressing `F5`
+4) Open Storage Explorer, Storage Accounts -> Emulator -> Blob Containers -> and create a container `test-samples-trigger` if it does not already exists
+5) Copy any .txt document file with text into the `test-samples-trigger` container
 
 You will see AI analysis happen in the Terminal standard out.  The analysis will be saved in a .txt file in the `test-samples-output` blob container.
 
@@ -74,9 +98,9 @@ You will see AI analysis happen in the Terminal standard out.  The analysis will
 1) Open a new terminal and do the following:
 
 ```bash
-cd text_summarize
+cd text_summarization
 dotnet build
-func start
+func start --csharp
 ```
 2) Open Storage Explorer, Storage Accounts -> Emulator -> Blob Containers -> and create a container `test-samples-trigger` if it does not already exists
 3) Copy any .txt document file with text into the `test-samples-trigger` container
