@@ -6,9 +6,10 @@
     "secrets1": {
       "type": "secrets"
     },
-    "storage2": {
+    "storage1": {
       "type": "storage",
-      "connectionId": "azurite"
+      "connectionId": "AzureWebJobsStorage",
+      "dynamicId": null
     }
   }
 }

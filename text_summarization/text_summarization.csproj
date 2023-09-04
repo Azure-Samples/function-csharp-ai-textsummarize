@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <TargetFramework>net7.0</TargetFramework>
     <AzureFunctionsVersion>v4</AzureFunctionsVersion>
@@ -6,7 +6,19 @@
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
     <UserSecretsId>4af7e2fb-2a2c-40e3-8beb-3ea5e81fc6c6</UserSecretsId>
+    <DefaultLocalSettingsJson>
+      {
+      "IsEncrypted": false,
+      "Values": {
+      "AzureWebJobsStorage": "UseDevelopmentStorage=true",
+      "FUNCTIONS_WORKER_RUNTIME": "dotnet-isolated"
+      }
+      }
+    </DefaultLocalSettingsJson>
   </PropertyGroup>
+  <Target Name="WriteDefaultSettings" Condition="!Exists('local.settings.json')" BeforeTargets="Build">
+    <WriteLinesToFile File="local.settings.json" Lines="$(DefaultLocalSettingsJson)" Overwrite="True" />
+  </Target>
   <ItemGroup>
     <PackageReference Include="Azure.AI.TextAnalytics" Version="5.3.0-beta.1" />
     <PackageReference Include="Azure.Storage.Blobs" Version="12.3.0" />
