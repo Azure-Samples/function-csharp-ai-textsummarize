@@ -11,7 +11,7 @@ products:
 - azure-cognitive-search
 urlFragment: function-csharp-ai-textsummarize
 name: Azure Functions - Text Summarization using AI Cognitive Language Service (C#-Isolated)
-description: Taking text documents as a input via BlobTrigger with C#, does Text Summarization processing using the AI Congnitive Language service, and then outputs to another text document using BlobOutput binding.
+description: Take text documents as a input via BlobTrigger with C#, does Text Summarization processing using the AI Congnitive Language service, and then outputs to another text document using BlobOutput binding.
 ---
 <!-- YAML front-matter schema: https://review.learn.microsoft.com/en-us/help/contribute/samples/process/onboarding?branch=main#supported-metadata-fields-for-readmemd -->
 
