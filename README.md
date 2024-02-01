@@ -7,7 +7,7 @@ languages:
 products:
 - azure
 - azure-functions
-- azure-ai-service
+- ai-services
 - azure-cognitive-search
 urlFragment: function-csharp-ai-textsummarize
 name: Azure Functions - Text Summarization using AI Cognitive Language Service (C#-Isolated)
