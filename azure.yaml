@@ -5,6 +5,6 @@ metadata:
   template: text-summzarize-csharp-ai-func@0.0.1-beta
 services:
   api:
-    project: ./text_summarize/
+    project: ./text_summarization/
     language: dotnet
     host: function
