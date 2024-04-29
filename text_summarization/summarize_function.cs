@@ -50,12 +50,12 @@ namespace AI_Functions
 
             TextAnalyticsActions actions = new TextAnalyticsActions()
             {
-                ExtractSummaryActions = new List<ExtractSummaryAction>() { new ExtractSummaryAction() }
+                ExtractiveSummarizeActions = new List<ExtractiveSummarizeAction>() { new ExtractiveSummarizeAction() }
             };
 
             // Start analysis process.
-            AnalyzeActionsOperation operation = await client.StartAnalyzeActionsAsync(batchInput, actions);
-            await operation.WaitForCompletionAsync();
+            ExtractiveSummarizeOperation operation = client.ExtractiveSummarize(WaitUntil.Completed, batchInput);
+        
             // View operation status.
             summarizedText += $"AnalyzeActions operation has completed" + Newline();
             summarizedText += $"Created On   : {operation.CreatedOn}" + Newline();
@@ -64,37 +64,33 @@ namespace AI_Functions
             summarizedText += $"Status       : {operation.Status}" + Newline();
 
             // View operation results.
-            await foreach (AnalyzeActionsResult documentsInPage in operation.Value)
+            await foreach (ExtractiveSummarizeResultCollection documentsInPage in operation.Value)
             {
-                IReadOnlyCollection<ExtractSummaryActionResult> summaryResults = documentsInPage.ExtractSummaryResults;
+                Console.WriteLine($"Extractive Summarize, version: \"{documentsInPage.ModelVersion}\"");
+                Console.WriteLine();
 
-                foreach (ExtractSummaryActionResult summaryActionResults in summaryResults)
+                foreach (ExtractiveSummarizeResult documentResult in documentsInPage)
                 {
-                    if (summaryActionResults.HasError)
+                    if (documentResult.HasError)
                     {
-                        logger.LogError($"  Error!");
-                        logger.LogError($"  Action error code: {summaryActionResults.Error.ErrorCode}.");
-                        logger.LogError($"  Message: {summaryActionResults.Error.Message}");
+                        Console.WriteLine($"  Error!");
+                        Console.WriteLine($"  Document error code: {documentResult.Error.ErrorCode}");
+                        Console.WriteLine($"  Message: {documentResult.Error.Message}");
                         continue;
                     }
 
-                    foreach (ExtractSummaryResult documentResults in summaryActionResults.DocumentsResults)
+                    Console.WriteLine($"  Extracted {documentResult.Sentences.Count} sentence(s):");
+                    Console.WriteLine();
+
+                    foreach (ExtractiveSummarySentence sentence in documentResult.Sentences)
                     {
-                        if (documentResults.HasError)
-                        {
-                            logger.LogError($"  Error!");
-                            logger.LogError($"  Document error code: {documentResults.Error.ErrorCode}.");
-                            logger.LogError($"  Message: {documentResults.Error.Message}");
-                            continue;
-                        }
+                        Console.WriteLine($"  Sentence: {sentence.Text}");
+                        Console.WriteLine($"  Rank Score: {sentence.RankScore}");
+                        Console.WriteLine($"  Offset: {sentence.Offset}");
+                        Console.WriteLine($"  Length: {sentence.Length}");
+                        Console.WriteLine();
 
-                        summarizedText += $"  Extracted the following {documentResults.Sentences.Count} sentence(s):" + Newline();
-
-
-                        foreach (SummarySentence sentence in documentResults.Sentences)
-                        {
-                            summarizedText += $"  Sentence: {sentence.Text}" + Newline();
-                        }
+                        summarizedText += $"  Sentence: {sentence.Text}" + Newline();
                     }
                 }
             }
