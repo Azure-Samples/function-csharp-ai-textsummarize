@@ -87,8 +87,7 @@ You will see AI analysis happen in the Terminal standard out.  The analysis will
 
 ```bash
 cd text_summarization
-dotnet build
-func start --csharp
+func start
 ```
 2) Open Storage Explorer, Storage Accounts -> Emulator -> Blob Containers -> and create a container `test-samples-trigger` if it does not already exists
 3) Copy any .txt document file with text into the `test-samples-trigger` container

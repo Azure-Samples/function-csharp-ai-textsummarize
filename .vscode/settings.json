@@ -1,5 +1,5 @@
 {
-    "azureFunctions.deploySubpath": "text_summarize/bin/Release/net7.0/publish",
+    "azureFunctions.deploySubpath": "text_summarization/bin/Release/net8.0/publish",
     "azureFunctions.projectLanguage": "C#",
     "azureFunctions.projectRuntime": "~4",
     "debug.internalConsoleOptions": "neverOpen",
