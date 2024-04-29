@@ -25,7 +25,7 @@ This sample shows how to take text documents as a input via BlobTrigger, does Te
 ## Run on your local environment
 
 ### Pre-reqs
-1) [.NET 7 SDK](https://dotnet.microsoft.com/en-us/download/dotnet/7.0) required *and [Visual Studio 2022](https://visualstudio.microsoft.com/vs/) is strongly recommended*
+1) [.NET 8 SDK](https://dotnet.microsoft.com/en-us/download/dotnet/8.0) required *and [Visual Studio 2022](https://visualstudio.microsoft.com/vs/) is strongly recommended*
 2) [Azure Functions Core Tools](https://learn.microsoft.com/en-us/azure/azure-functions/functions-run-local?tabs=v4%2Cmacos%2Ccsharp%2Cportal%2Cbash#install-the-azure-functions-core-tools)
 3) [Azurite](https://github.com/Azure/Azurite)
 
@@ -73,7 +73,7 @@ Search for Environment Variables in Settings, create new System Variables simila
 3) Open Storage Explorer, Storage Accounts -> Emulator -> Blob Containers -> and create a container `test-samples-trigger` if it does not already exists
 4) Copy any .txt document file with text into the `test-samples-trigger` container
 
-You will see AI analysis happen in the Terminal standard out.  The analysis will be saved in a .txt file in the `` blob container.
+You will see AI analysis happen in the Terminal standard out.  The analysis will be saved in a .txt file in the `test-samples-output` blob container.
 
 ### Using VS Code
 1) Open the root folder in VS Code:
@@ -104,8 +104,7 @@ You will see AI analysis happen in the Terminal standard out.  The analysis will
 
 ```bash
 cd text_summarization
-dotnet build
-func start --csharp
+func start
 ```
 2) Open Storage Explorer, Storage Accounts -> Emulator -> Blob Containers -> and create a container `test-samples-trigger` if it does not already exists
 3) Copy any .txt document file with text into the `test-samples-trigger` container
@@ -114,10 +113,12 @@ You will see AI analysis happen in the Terminal standard out.  The analysis will
 
 ## Deploy to Azure
 
-The easiest way to deploy this app is using the [Azure Dev CLI aka AZD](https://aka.ms/azd).  If you open this repo in GitHub CodeSpaces the AZD tooling is already preinstalled.
+The easiest way to deploy this app is using the [Azure Developer CLI](https://aka.ms/azd).  If you open this repo in GitHub CodeSpaces the AZD tooling is already preinstalled.
 
 To provision and deploy:
 1) Open a new terminal and do the following from root folder:
 ```bash
 azd up
 ```
+
+* Note if you see a "resource group not found" type error this is caused by timing, and you can `azd up` again to safely resolve.

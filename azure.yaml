@@ -2,7 +2,7 @@
 
 name: text-summzarize-csharp-ai-func
 metadata:
-  template: text-summzarize-csharp-ai-func@0.0.1-beta
+  template: text-summzarize-csharp-ai-func@0.0.2
 services:
   api:
     project: ./text_summarization/
