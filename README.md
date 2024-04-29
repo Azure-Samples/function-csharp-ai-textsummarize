@@ -56,7 +56,7 @@ Search for Environment Variables in Settings, create new System Variables simila
 3) Open Storage Explorer, Storage Accounts -> Emulator -> Blob Containers -> and create a container `test-samples-trigger` if it does not already exists
 4) Copy any .txt document file with text into the `test-samples-trigger` container
 
-You will see AI analysis happen in the Terminal standard out.  The analysis will be saved in a .txt file in the `` blob container.
+You will see AI analysis happen in the Terminal standard out.  The analysis will be saved in a .txt file in the `test-samples-output` blob container.
 
 ### Using VS Code
 1) Open the root folder in VS Code:
@@ -97,10 +97,12 @@ You will see AI analysis happen in the Terminal standard out.  The analysis will
 
 ## Deploy to Azure
 
-The easiest way to deploy this app is using the [Azure Dev CLI aka AZD](https://aka.ms/azd).  If you open this repo in GitHub CodeSpaces the AZD tooling is already preinstalled.
+The easiest way to deploy this app is using the [Azure Developer CLI](https://aka.ms/azd).  If you open this repo in GitHub CodeSpaces the AZD tooling is already preinstalled.
 
 To provision and deploy:
 1) Open a new terminal and do the following from root folder:
 ```bash
 azd up
 ```
+
+* Note if you see a "resource group not found" type error this is caused by timing, and you can `azd up` again to safely resolve.
