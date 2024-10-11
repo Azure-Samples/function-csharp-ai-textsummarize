@@ -18,7 +18,7 @@ description: Take text documents as a input via BlobTrigger with C#, does Text S
 # Azure Functions
 ## Text Summarization & Sentiment Analysis using AI Cognitive Language Service (C#-Isolated)
 
-This sample shows how to take text documents as a input via BlobTrigger, does Text Summarization processing using the AI Congnitive Language service and ExtractiveSummarize operations, then computes sentiment scores, and then outputs to another text document using BlobOutput binding.  
+This sample shows how to take text documents as a input via BlobTrigger, does Text Summarization processing using the [AI Congnitive Language Service](https://learn.microsoft.com/en-us/azure/ai-services/language-service/) and ExtractiveSummarize operations, then computes sentiment scores, and then outputs to another text document using BlobOutput binding.  
 
 [![Open in GitHub Codespaces](https://github.com/codespaces/badge.svg)](https://github.com/codespaces/new?hide_repo_select=true&ref=main&repo=575770869)
 
@@ -148,7 +148,7 @@ public async Task<string> Run(
 }
 ```
 
-The `AISummarizeText` helper function does the heavy lifting for summary extraction and sentiment analysis using the `TextAnalyticsClient` from the [AI Language Services SDK](https://learn.microsoft.com/en-us/azure/ai-services/language-service/):
+The `AISummarizeText` helper function does the heavy lifting for summary extraction and sentiment analysis using the `TextAnalyticsClient` SDK from the [AI Language Services](https://learn.microsoft.com/en-us/azure/ai-services/language-service/):
 
 ```csharp
 static async Task<string> AISummarizeText(TextAnalyticsClient client, string document, ILogger logger)
