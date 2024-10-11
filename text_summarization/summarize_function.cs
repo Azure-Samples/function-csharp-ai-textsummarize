@@ -21,19 +21,12 @@ namespace AI_Functions
             _logger = loggerFactory.CreateLogger<summarize_function>();
 
             credentials = new DefaultAzureCredential();
-            var key = Environment.GetEnvironmentVariable("TEXT_ANALYTICS_KEY");
-            if (string.IsNullOrEmpty(key))
-            {
-                throw new InvalidOperationException("Environment variable 'TEXT_ANALYTICS_KEY' is not set.");
-            }
-            keyCredential = new AzureKeyCredential(key);
-
-            var endpointUri = Environment.GetEnvironmentVariable("TEXT_ANALYTICS_ENDPOINT");
-            if (string.IsNullOrEmpty(endpointUri))
-            {
-                throw new InvalidOperationException("Environment variable 'TEXT_ANALYTICS_ENDPOINT' is not set.");
-            }
+            var key = Environment.GetEnvironmentVariable("TEXT_ANALYTICS_KEY") 
+                      ?? throw new InvalidOperationException("Environment variable 'TEXT_ANALYTICS_KEY' is not set.");
+            var endpointUri = Environment.GetEnvironmentVariable("TEXT_ANALYTICS_ENDPOINT") 
+                              ?? throw new InvalidOperationException("Environment variable 'TEXT_ANALYTICS_ENDPOINT' is not set.");
             endpoint = new Uri(endpointUri);
+            keyCredential = new AzureKeyCredential(key);
         }
 
         [Function("summarize_function")]
@@ -54,7 +47,7 @@ namespace AI_Functions
             // Blob Output
             return summarizedText;
         }
-        static async Task<string> AISummarizeText(TextAnalyticsClient client, string document, ILogger logger)
+        private async Task<string> AISummarizeText(TextAnalyticsClient client, string document, ILogger logger)
         {
 
             // Perform Extractive Summarization
@@ -130,7 +123,7 @@ namespace AI_Functions
             return summaryWithSentiment;
         }
 
-        static string Newline()
+        private string Newline()
         {
             return "\r\n";
         }
