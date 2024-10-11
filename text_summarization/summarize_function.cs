@@ -1,5 +1,7 @@
 using Azure;
 using Azure.AI.TextAnalytics;
+using Azure.Core;
+using Azure.Identity;
 using Microsoft.Azure.Functions.Worker;
 using Microsoft.Extensions.Logging;
 
@@ -10,24 +12,40 @@ namespace AI_Functions
         private readonly ILogger _logger;
 
         // must export and set these Env vars with your AI Cognitive Language resource values
-        private static readonly AzureKeyCredential credentials = new AzureKeyCredential(Environment.GetEnvironmentVariable("AI_SECRET") ?? "SETENVVAR!");
-        private static readonly Uri endpoint = new Uri(Environment.GetEnvironmentVariable("AI_URL") ?? "SETENVVAR!");
+        private TokenCredential credentials;
+        private AzureKeyCredential keyCredential;
+        private Uri endpoint;
 
         public summarize_function(ILoggerFactory loggerFactory)
         {
             _logger = loggerFactory.CreateLogger<summarize_function>();
+
+            credentials = new DefaultAzureCredential();
+            var key = Environment.GetEnvironmentVariable("TEXT_ANALYTICS_KEY");
+            if (string.IsNullOrEmpty(key))
+            {
+                throw new InvalidOperationException("Environment variable 'TEXT_ANALYTICS_KEY' is not set.");
+            }
+            keyCredential = new AzureKeyCredential(key);
+
+            var endpointUri = Environment.GetEnvironmentVariable("TEXT_ANALYTICS_ENDPOINT");
+            if (string.IsNullOrEmpty(endpointUri))
+            {
+                throw new InvalidOperationException("Environment variable 'TEXT_ANALYTICS_ENDPOINT' is not set.");
+            }
+            endpoint = new Uri(endpointUri);
         }
 
         [Function("summarize_function")]
         [BlobOutput("test-samples-output/{name}-output.txt")]
-        public static async Task<string> Run(
+        public async Task<string> Run(
             [BlobTrigger("test-samples-trigger/{name}")] string myTriggerItem,
             FunctionContext context)
         {
             var logger = context.GetLogger("summarize_function");
             logger.LogInformation($"Triggered Item = {myTriggerItem}");
 
-            var client = new TextAnalyticsClient(endpoint, credentials);
+            var client = new TextAnalyticsClient(endpoint, keyCredential);
 
             // analyze document text using Azure Cognitive Language Services
             var summarizedText = await AISummarizeText(client, myTriggerItem, logger);
