@@ -10,17 +10,17 @@ products:
 - ai-services
 - azure-cognitive-search
 urlFragment: function-csharp-ai-textsummarize
-name: Azure Functions - Text Summarization using AI Cognitive Language Service (C#-Isolated)
+name: Azure Functions - Text Summarization & Sentiment Analysis using AI Cognitive Language Service (C#-Isolated)
 description: Take text documents as a input via BlobTrigger with C#, does Text Summarization processing using the AI Congnitive Language service, and then outputs to another text document using BlobOutput binding.
 ---
 <!-- YAML front-matter schema: https://review.learn.microsoft.com/en-us/help/contribute/samples/process/onboarding?branch=main#supported-metadata-fields-for-readmemd -->
 
 # Azure Functions
-## Text Summarization using AI Cognitive Language Service (C#-Isolated)
+## Text Summarization & Sentiment Analysis using AI Cognitive Language Service (C#-Isolated)
 
-This sample shows how to take text documents as a input via BlobTrigger, does Text Summarization processing using the AI Congnitive Language service, and then outputs to another text document using BlobOutput binding.  
+This sample shows how to take text documents as a input via BlobTrigger, does Text Summarization processing using the [AI Congnitive Language Service](https://learn.microsoft.com/en-us/azure/ai-services/language-service/) and ExtractiveSummarize operations, then computes sentiment scores, and then outputs to another text document using BlobOutput binding.  
 
-[![Open in GitHub Codespaces](https://github.com/codespaces/badge.svg)](https://github.com/codespaces/new?hide_repo_select=true&ref=main&repo=575770869)
+[![Open in GitHub Codespaces](https://github.com/codespaces/badge.svg)](https://codespaces.new/Azure-Samples/function-csharp-ai-textsummarize)
 
 ## Run on your local environment
 
@@ -122,3 +122,60 @@ azd up
 ```
 
 * Note if you see a "resource group not found" type error this is caused by timing, and you can `azd up` again to safely resolve.
+
+## Understand the Code
+
+The main operation of the code starts with the `summarize_function` function in [summarize_function.cs](./text_summarization/summarize_function.cs).  The function is triggered by a Blob uploaded event using BlobTrigger, your code runs to do the processing with AI, and then the output is returned as another blob file simply by returning a value and using the BlobOutput binding.  
+
+```csharp
+[Function("summarize_function")]
+[BlobOutput("test-samples-output/{name}-output.txt")]
+public async Task<string> Run(
+    [BlobTrigger("test-samples-trigger/{name}")] string myTriggerItem,
+    FunctionContext context)
+{
+    var logger = context.GetLogger("summarize_function");
+    logger.LogInformation($"Triggered Item = {myTriggerItem}");
+
+    var client = new TextAnalyticsClient(endpoint, credentials);
+
+    // analyze document text using Azure Cognitive Language Services
+    var summarizedText = await AISummarizeText(client, myTriggerItem, logger);
+    logger.LogInformation(Newline() + "*****Summary*****" + Newline() + summarizedText);
+
+    // Blob Output
+    return summarizedText;
+}
+```
+
+The `AISummarizeText` helper function does the heavy lifting for summary extraction and sentiment analysis using the `TextAnalyticsClient` SDK from the [AI Language Services](https://learn.microsoft.com/en-us/azure/ai-services/language-service/):
+
+```csharp
+static async Task<string> AISummarizeText(TextAnalyticsClient client, string document, ILogger logger)
+{
+    // ...
+    // Start analysis process.
+    ExtractiveSummarizeOperation operation = client.ExtractiveSummarize(WaitUntil.Completed, batchInput);
+
+    // View operation status.
+    summarizedText += $"AnalyzeActions operation has completed" + Newline();
+    summarizedText += $"Created On   : {operation.CreatedOn}" + Newline();
+    summarizedText += $"Expires On   : {operation.ExpiresOn}" + Newline();
+    summarizedText += $"Id           : {operation.Id}" + Newline();
+    summarizedText += $"Status       : {operation.Status}" + Newline();
+
+    // ...
+
+    // Perform sentiment analysis on document summary
+    var sentimentResult = await client.AnalyzeSentimentAsync(summarizedText);
+    Console.WriteLine($"\nSentiment: {sentimentResult.Value.Sentiment}");
+    Console.WriteLine($"Positive Score: {sentimentResult.Value.ConfidenceScores.Positive}");
+    Console.WriteLine($"Negative Score: {sentimentResult.Value.ConfidenceScores.Negative}");
+    Console.WriteLine($"Neutral Score: {sentimentResult.Value.ConfidenceScores.Neutral}");
+
+    var summaryWithSentiment = summarizedText + $"Sentiment: {sentimentResult.Value.Sentiment}" + Newline();
+
+    return summaryWithSentiment;
+}
+
+```

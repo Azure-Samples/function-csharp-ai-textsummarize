@@ -39,6 +39,7 @@ namespace AI_Functions
         static async Task<string> AISummarizeText(TextAnalyticsClient client, string document, ILogger logger)
         {
 
+            // Perform Extractive Summarization
             string summarizedText = "";
 
             // Prepare analyze operation input. You can add multiple documents to this list and perform the same
@@ -93,10 +94,22 @@ namespace AI_Functions
                         summarizedText += $"  Sentence: {sentence.Text}" + Newline();
                     }
                 }
+
+                
             }
 
             logger.LogInformation(Newline() + "*****Summary*****" + Newline() + summarizedText);
-            return summarizedText;
+
+            // Perform sentiment analysis on document summary
+            var sentimentResult = await client.AnalyzeSentimentAsync(summarizedText);
+            Console.WriteLine($"\nSentiment: {sentimentResult.Value.Sentiment}");
+            Console.WriteLine($"Positive Score: {sentimentResult.Value.ConfidenceScores.Positive}");
+            Console.WriteLine($"Negative Score: {sentimentResult.Value.ConfidenceScores.Negative}");
+            Console.WriteLine($"Neutral Score: {sentimentResult.Value.ConfidenceScores.Neutral}");
+    
+            var summaryWithSentiment = summarizedText + $"Sentiment: {sentimentResult.Value.Sentiment}" + Newline();
+            
+            return summaryWithSentiment;
         }
 
         static string Newline()
