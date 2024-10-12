@@ -30,9 +30,9 @@ namespace AI_Functions
         }
 
         [Function("summarize_function")]
-        [BlobOutput("test-samples-output/{name}-output.txt")]
+        [BlobOutput("processed-text/{name}-output.txt")]
         public async Task<string> Run(
-            [BlobTrigger("test-samples-trigger/{name}")] string myTriggerItem,
+            [BlobTrigger("unprocessed-text/{name}", Source = BlobTriggerSource.EventGrid)] string myTriggerItem,
             FunctionContext context)
         {
             var logger = context.GetLogger("summarize_function");

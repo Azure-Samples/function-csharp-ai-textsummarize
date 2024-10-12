@@ -25,7 +25,7 @@ This sample shows how to take text documents as a input via BlobTrigger, does Te
 ## Run on your local environment
 
 ### Pre-reqs
-1) [.NET 8 SDK](https://dotnet.microsoft.com/en-us/download/dotnet/8.0) required *and [Visual Studio 2022](https://visualstudio.microsoft.com/vs/) is strongly recommended*
+1) [.NET 8 SDK](https://dotnet.microsoft.com/en-us/download/dotnet/8.0)
 2) [Azure Functions Core Tools](https://learn.microsoft.com/en-us/azure/azure-functions/functions-run-local?tabs=v4%2Cmacos%2Ccsharp%2Cportal%2Cbash#install-the-azure-functions-core-tools)
 3) [Azurite](https://github.com/Azure/Azurite)
 
@@ -34,35 +34,25 @@ The easiest way to install Azurite is using a Docker container or the support bu
 docker run -d -p 10000:10000 -p 10001:10001 -p 10002:10002 mcr.microsoft.com/azure-storage/azurite
 ```
 
-4) Once you have your Azure subscription, [create a Language resource](https://portal.azure.com/#create/Microsoft.CognitiveServicesTextAnalytics) in the Azure portal to get your key and endpoint. After it deploys, click Go to resource.  Note: if you perform `azd provision` or `azd up` per the section at the end of the tutorial, this resource will already be created.  
-You will need the key and endpoint from the resource you create to connect your application to the API. You'll need to store the key and endpoint into the Env Vars or User Secrets code in a next step the quickstart.
-You can use the free pricing tier (Free F0) to try the service, and upgrade later to a paid tier for production.
-5) Export these secrets as Env Vars using values from Step 4.
+4) Once you have your Azure subscription, run the following in a new terminal window to create all the AI Language and other resources needed:
+```azd provision```
 
-Mac/Linux
+Take note of the value of `TEXT_ANALYTICS_ENDPOINT` which can be found in `./.azure/<env name from azd provision>/.env`.  It will look something like:
 ```bash
-export AI_URL=*Paste from step 4*
-export AI_SECRET=*Paste from step 4*
+TEXT_ANALYTICS_ENDPOINT="https://<unique string>.cognitiveservices.azure.com/"
 ```
 
-Windows
+Alternatively you can [create a Language resource](https://portal.azure.com/#create/Microsoft.CognitiveServicesTextAnalytics) in the Azure portal to get your key and endpoint. After it deploys, click Go to resource and view the Endpoint value.
 
-Search for Environment Variables in Settings, create new System Variables similarly to [these instructions](https://docs.oracle.com/en/database/oracle/machine-learning/oml4r/1.5.1/oread/creating-and-modifying-environment-variables-on-windows.html#GUID-DD6F9982-60D5-48F6-8270-A27EC53807D0):
-
-| Variable | Value |
-| -------- | ----- |
-| AI_URL | *Paste from step 4* |
-| AI_SECRET | *Paste from step 4* |
-6) [Azure Storage Explorer](https://azure.microsoft.com/en-us/products/storage/storage-explorer/) or storage explorer features of [Azure Portal](https://portal.azure.com)
-7) Add this `local.settings.json` file to the `./text_summarization` folder to simplify local development.  Optionally fill in the AI_URL and AI_SECRET values per step 4.  This file will be gitignored to protect secrets from committing to your repo.  
+5) [Azure Storage Explorer](https://azure.microsoft.com/en-us/products/storage/storage-explorer/) or storage explorer features of [Azure Portal](https://portal.azure.com)
+6) Add this `local.settings.json` file to the `./text_summarization` folder to simplify local development.  Optionally fill in the AI_URL and AI_SECRET values per step 4.  This file will be gitignored to protect secrets from committing to your repo.  
 ```json
 {
     "IsEncrypted": false,
     "Values": {
         "AzureWebJobsStorage": "UseDevelopmentStorage=true",
         "FUNCTIONS_WORKER_RUNTIME": "dotnet-isolated",
-        "AI_URL": "",
-        "AI_SECRET": ""
+        "TEXT_ANALYTICS_ENDPOINT": "<insert from step 4>"
     }
 }
 ```
@@ -70,10 +60,10 @@ Search for Environment Variables in Settings, create new System Variables simila
 ### Using Visual Studio
 1) Open `text_summarization.sln` using Visual Studio 2022 or later.
 2) Press Run (`F5`) to run in the debugger
-3) Open Storage Explorer, Storage Accounts -> Emulator -> Blob Containers -> and create a container `test-samples-trigger` if it does not already exists
-4) Copy any .txt document file with text into the `test-samples-trigger` container
+3) Open Storage Explorer, Storage Accounts -> Emulator -> Blob Containers -> and create a container `unprocessed-text` if it does not already exists
+4) Copy any .txt document file with text into the `unprocessed-text` container
 
-You will see AI analysis happen in the Terminal standard out.  The analysis will be saved in a .txt file in the `test-samples-output` blob container.
+You will see AI analysis happen in the Terminal standard out.  The analysis will be saved in a .txt file in the `processed-text` blob container.
 
 ### Using VS Code
 1) Open the root folder in VS Code:
@@ -81,25 +71,15 @@ You will see AI analysis happen in the Terminal standard out.  The analysis will
 ```bash
 code .
 ```
-2) Add this `local.settings.json` file to the `./text_summarization` folder to simplify local development.  Optionally fill in the AI_URL and AI_SECRET values per step 4 above.  This file will be gitignored to protect secrets from committing to your repo.  
-```json
-{
-    "IsEncrypted": false,
-    "Values": {
-        "AzureWebJobsStorage": "UseDevelopmentStorage=true",
-        "FUNCTIONS_WORKER_RUNTIME": "dotnet-isolated",
-        "AI_URL": "",
-        "AI_SECRET": ""
-    }
-}
-```
+2) Ensure `local.settings.json` exists already using steps above
 3) Run and Debug by pressing `F5`
-4) Open Storage Explorer, Storage Accounts -> Emulator -> Blob Containers -> and create a container `test-samples-trigger` if it does not already exists
-5) Copy any .txt document file with text into the `test-samples-trigger` container
+4) Open Storage Explorer, Storage Accounts -> Emulator -> Blob Containers -> and create a container `unprocessed-text` if it does not already exists
+5) Copy any .txt document file with text into the `unprocessed-text` container
 
-You will see AI analysis happen in the Terminal standard out.  The analysis will be saved in a .txt file in the `test-samples-output` blob container.
+You will see AI analysis happen in the Terminal standard out.  The analysis will be saved in a .txt file in the `processed-text` blob container.
 
-### Using Functions CLI
+### Using Functions Core Tools CLI
+0) Ensure `local.settings.json` exists already using steps above
 1) Open a new terminal and do the following:
 
 ```bash
@@ -121,23 +101,24 @@ To provision and deploy:
 azd up
 ```
 
-* Note if you see a "resource group not found" type error this is caused by timing, and you can `azd up` again to safely resolve.
-
 ## Understand the Code
 
 The main operation of the code starts with the `summarize_function` function in [summarize_function.cs](./text_summarization/summarize_function.cs).  The function is triggered by a Blob uploaded event using BlobTrigger, your code runs to do the processing with AI, and then the output is returned as another blob file simply by returning a value and using the BlobOutput binding.  
 
 ```csharp
 [Function("summarize_function")]
-[BlobOutput("test-samples-output/{name}-output.txt")]
+[BlobOutput("processed-text/{name}-output.txt")]
 public async Task<string> Run(
-    [BlobTrigger("test-samples-trigger/{name}")] string myTriggerItem,
+    [BlobTrigger("unprocessed-text/{name}", Source = BlobTriggerSource.EventGrid)] string myTriggerItem,
     FunctionContext context)
 {
     var logger = context.GetLogger("summarize_function");
     logger.LogInformation($"Triggered Item = {myTriggerItem}");
 
-    var client = new TextAnalyticsClient(endpoint, credentials);
+    // Create client using Entra User or Managed Identity (no longer AzureKeyCredential)
+    // This requires a sub domain name to be set in endpoint URL for Managed Identity support
+    // See https://learn.microsoft.com/en-us/azure/ai-services/authentication#authenticate-with-microsoft-entra-id 
+    var client = new TextAnalyticsClient(endpoint, new DefaultAzureCredential());
 
     // analyze document text using Azure Cognitive Language Services
     var summarizedText = await AISummarizeText(client, myTriggerItem, logger);
