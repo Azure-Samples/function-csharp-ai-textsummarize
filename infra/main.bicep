@@ -7,6 +7,23 @@ param environmentName string
 
 @minLength(1)
 @description('Primary location for all resources')
+@allowed([
+  'australiaeast'
+  'brazilsouth'
+  'canadacentral'
+  'centralindia'
+  'eastasia'
+  'eastus'
+  'japaneast'
+  'northeurope'
+  'southcentralus'
+  'southeastasia'
+  'uksouth'
+  'westcentralus'
+  'westeurope'
+  'westus'
+  'westus2'
+])
 param location string
 
 // Optional parameters to override the default azd resource naming conventions. Update the main.parameters.json file to provide values. e.g.,:
@@ -49,6 +66,7 @@ module ai 'app/ai.bicep' = {
     name: !empty(aiResourceName) ? aiResourceName : '${abbrs.cognitiveServicesTextAnalytics}-${resourceToken}'
     location: location
     tags: tags
+    customSubDomainName: resourceToken
   }
 }
 
