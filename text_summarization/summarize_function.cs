@@ -1,5 +1,8 @@
 using Azure;
 using Azure.AI.TextAnalytics;
+using Azure.Core;
+using Azure.Core.Diagnostics;
+using Azure.Identity;
 using Microsoft.Azure.Functions.Worker;
 using Microsoft.Extensions.Logging;
 
@@ -10,24 +13,35 @@ namespace AI_Functions
         private readonly ILogger _logger;
 
         // must export and set these Env vars with your AI Cognitive Language resource values
-        private static readonly AzureKeyCredential credentials = new AzureKeyCredential(Environment.GetEnvironmentVariable("AI_SECRET") ?? "SETENVVAR!");
-        private static readonly Uri endpoint = new Uri(Environment.GetEnvironmentVariable("AI_URL") ?? "SETENVVAR!");
+        private TokenCredential credentials;
+        private AzureKeyCredential keyCredential;
+        private Uri endpoint;
 
         public summarize_function(ILoggerFactory loggerFactory)
         {
             _logger = loggerFactory.CreateLogger<summarize_function>();
+
+            // var key = Environment.GetEnvironmentVariable("TEXT_ANALYTICS_KEY") 
+            //           ?? throw new InvalidOperationException("Environment variable 'TEXT_ANALYTICS_KEY' is not set.");
+            // keyCredential = new AzureKeyCredential(key);
+            var endpointUri = Environment.GetEnvironmentVariable("TEXT_ANALYTICS_ENDPOINT") 
+                              ?? throw new InvalidOperationException("Environment variable 'TEXT_ANALYTICS_ENDPOINT' is not set.");
+            endpoint = new Uri(endpointUri);
         }
 
         [Function("summarize_function")]
-        [BlobOutput("test-samples-output/{name}-output.txt")]
-        public static async Task<string> Run(
-            [BlobTrigger("test-samples-trigger/{name}")] string myTriggerItem,
+        [BlobOutput("processed-text/{name}-output.txt")]
+        public async Task<string> Run(
+            [BlobTrigger("unprocessed-text/{name}", Source = BlobTriggerSource.EventGrid)] string myTriggerItem,
             FunctionContext context)
         {
             var logger = context.GetLogger("summarize_function");
             logger.LogInformation($"Triggered Item = {myTriggerItem}");
 
-            var client = new TextAnalyticsClient(endpoint, credentials);
+            // Create client using Entra User or Managed Identity (no longer AzureKeyCredential)
+            // This requires a sub domain name to be set in endpoint URL for Managed Identity support
+            // See https://learn.microsoft.com/en-us/azure/ai-services/authentication#authenticate-with-microsoft-entra-id 
+            var client = new TextAnalyticsClient(endpoint, new DefaultAzureCredential());
 
             // analyze document text using Azure Cognitive Language Services
             var summarizedText = await AISummarizeText(client, myTriggerItem, logger);
@@ -36,7 +50,7 @@ namespace AI_Functions
             // Blob Output
             return summarizedText;
         }
-        static async Task<string> AISummarizeText(TextAnalyticsClient client, string document, ILogger logger)
+        private async Task<string> AISummarizeText(TextAnalyticsClient client, string document, ILogger logger)
         {
 
             // Perform Extractive Summarization
@@ -112,7 +126,7 @@ namespace AI_Functions
             return summaryWithSentiment;
         }
 
-        static string Newline()
+        private string Newline()
         {
             return "\r\n";
         }
