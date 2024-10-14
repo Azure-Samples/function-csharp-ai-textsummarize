@@ -11,14 +11,14 @@ products:
 - azure-cognitive-search
 urlFragment: function-csharp-ai-textsummarize
 name: Azure Functions - Text Summarization & Sentiment Analysis using AI Cognitive Language Service (C#-Isolated)
-description: Take text documents as a input via BlobTrigger with C#, does Text Summarization processing using the AI Congnitive Language service, and then outputs to another text document using BlobOutput binding.
+description: This sample shows how to take text documents as a input via BlobTrigger, does Text Summarization & Sentiment Score processing using the AI Congnitive Language service, and then outputs to another text document using BlobOutput binding. Deploys to Flex Consumption hosting plan of Azure Functions.
 ---
 <!-- YAML front-matter schema: https://review.learn.microsoft.com/en-us/help/contribute/samples/process/onboarding?branch=main#supported-metadata-fields-for-readmemd -->
 
 # Azure Functions
 ## Text Summarization & Sentiment Analysis using AI Cognitive Language Service (C#-Isolated)
 
-This sample shows how to take text documents as a input via BlobTrigger, does Text Summarization processing using the [AI Congnitive Language Service](https://learn.microsoft.com/en-us/azure/ai-services/language-service/) and ExtractiveSummarize operations, then computes sentiment scores, and then outputs to another text document using BlobOutput binding.  
+This sample shows how to take text documents as a input via BlobTrigger, does Text Summarization processing using the [AI Congnitive Language Service](https://learn.microsoft.com/en-us/azure/ai-services/language-service/) ExtractiveSummarize operations, then computes sentiment scores, and then outputs to another text document using BlobOutput binding.  Deploys to Flex Consumption hosting plan of Azure Functions.
 
 [![Open in GitHub Codespaces](https://github.com/codespaces/badge.svg)](https://codespaces.new/Azure-Samples/function-csharp-ai-textsummarize)
 
@@ -35,7 +35,9 @@ docker run -d -p 10000:10000 -p 10001:10001 -p 10002:10002 mcr.microsoft.com/azu
 ```
 
 4) Once you have your Azure subscription, run the following in a new terminal window to create all the AI Language and other resources needed:
-```azd provision```
+```bash
+azd provision
+```
 
 Take note of the value of `TEXT_ANALYTICS_ENDPOINT` which can be found in `./.azure/<env name from azd provision>/.env`.  It will look something like:
 ```bash
