@@ -12,27 +12,25 @@ namespace AI_Functions
     {
         private readonly ILogger _logger;
 
-        // must export and set these Env vars with your AI Cognitive Language resource values
-        private TokenCredential credentials;
-        private AzureKeyCredential keyCredential;
+        private TokenCredential credential;
+
         private Uri endpoint;
 
         public summarize_function(ILoggerFactory loggerFactory)
         {
             _logger = loggerFactory.CreateLogger<summarize_function>();
 
-            // var key = Environment.GetEnvironmentVariable("TEXT_ANALYTICS_KEY") 
-            //           ?? throw new InvalidOperationException("Environment variable 'TEXT_ANALYTICS_KEY' is not set.");
-            // keyCredential = new AzureKeyCredential(key);
             var endpointUri = Environment.GetEnvironmentVariable("TEXT_ANALYTICS_ENDPOINT") 
                               ?? throw new InvalidOperationException("Environment variable 'TEXT_ANALYTICS_ENDPOINT' is not set.");
             endpoint = new Uri(endpointUri);
+
+            credential = new DefaultAzureCredential();
         }
 
         [Function("summarize_function")]
         [BlobOutput("processed-text/{name}-output.txt")]
         public async Task<string> Run(
-            [BlobTrigger("unprocessed-text/{name}", Source = BlobTriggerSource.EventGrid)] string myTriggerItem,
+            [BlobTrigger("unprocessed-text/{name}", Source = BlobTriggerSource.EventGrid )] string myTriggerItem,
             FunctionContext context)
         {
             var logger = context.GetLogger("summarize_function");
@@ -41,7 +39,7 @@ namespace AI_Functions
             // Create client using Entra User or Managed Identity (no longer AzureKeyCredential)
             // This requires a sub domain name to be set in endpoint URL for Managed Identity support
             // See https://learn.microsoft.com/en-us/azure/ai-services/authentication#authenticate-with-microsoft-entra-id 
-            var client = new TextAnalyticsClient(endpoint, new DefaultAzureCredential());
+            var client = new TextAnalyticsClient(endpoint, credential);
 
             // analyze document text using Azure Cognitive Language Services
             var summarizedText = await AISummarizeText(client, myTriggerItem, logger);
