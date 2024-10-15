@@ -59,15 +59,6 @@ Alternatively you can [create a Language resource](https://portal.azure.com/#cre
 }
 ```
 
-### Using Visual Studio
-1) Open `text_summarization.sln` using Visual Studio 2022 or later
-2) Ensure `local.settings.json` exists already using steps above
-3) Press Run (`F5`) to run in the debugger
-4) Open Storage Explorer, Storage Accounts -> Emulator -> Blob Containers -> and create a container `unprocessed-text` if it does not already exists
-5) Copy any .txt document file with text into the `unprocessed-text` container
-
-You will see AI analysis happen in the Terminal standard out.  The analysis will be saved in a .txt file in the `processed-text` blob container.
-
 ### Using VS Code
 1) Open the root folder in VS Code:
 ```bash
