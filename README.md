@@ -33,8 +33,8 @@ The easiest way to install Azurite is using a Docker container or the support bu
 ```bash
 docker run -d -p 10000:10000 -p 10001:10001 -p 10002:10002 mcr.microsoft.com/azure-storage/azurite
 ```
-
-4) Once you have your Azure subscription, run the following in a new terminal window to create all the AI Language and other resources needed:
+4) [Azure Developer CLI](https://aka.ms/azd)
+5) Once you have your Azure subscription, run the following in a new terminal window to create all the AI Language and other resources needed:
 ```bash
 azd provision
 ```
@@ -47,7 +47,7 @@ TEXT_ANALYTICS_ENDPOINT="https://<unique string>.cognitiveservices.azure.com/"
 Alternatively you can [create a Language resource](https://portal.azure.com/#create/Microsoft.CognitiveServicesTextAnalytics) in the Azure portal to get your key and endpoint. After it deploys, click Go to resource and view the Endpoint value.
 
 5) [Azure Storage Explorer](https://azure.microsoft.com/en-us/products/storage/storage-explorer/) or storage explorer features of [Azure Portal](https://portal.azure.com)
-6) Add this `local.settings.json` file to the `./text_summarization` folder to simplify local development.  Optionally fill in the AI_URL and AI_SECRET values per step 4.  This file will be gitignored to protect secrets from committing to your repo.  
+6) Add this `local.settings.json` file to the `./text_summarization` folder to simplify local development.  Fill in the TEXT_ANALYTICS_ENDPOINT value per step 4.  This file will be gitignored to protectfrom committing to your repo.  
 ```json
 {
     "IsEncrypted": false,
@@ -60,16 +60,16 @@ Alternatively you can [create a Language resource](https://portal.azure.com/#cre
 ```
 
 ### Using Visual Studio
-1) Open `text_summarization.sln` using Visual Studio 2022 or later.
-2) Press Run (`F5`) to run in the debugger
-3) Open Storage Explorer, Storage Accounts -> Emulator -> Blob Containers -> and create a container `unprocessed-text` if it does not already exists
-4) Copy any .txt document file with text into the `unprocessed-text` container
+1) Open `text_summarization.sln` using Visual Studio 2022 or later
+2) Ensure `local.settings.json` exists already using steps above
+3) Press Run (`F5`) to run in the debugger
+4) Open Storage Explorer, Storage Accounts -> Emulator -> Blob Containers -> and create a container `unprocessed-text` if it does not already exists
+5) Copy any .txt document file with text into the `unprocessed-text` container
 
 You will see AI analysis happen in the Terminal standard out.  The analysis will be saved in a .txt file in the `processed-text` blob container.
 
 ### Using VS Code
 1) Open the root folder in VS Code:
-
 ```bash
 code .
 ```
